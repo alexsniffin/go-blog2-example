@@ -1,0 +1,21 @@
+Logger:
+  Level: debug
+
+# Contains the collection of rules to execute, outputs the expression result to a variable .Output
+Evaluator:
+  ExprVariableName: "query_result"
+  Rules:
+    - Query: 'sum(rate(go_gc_duration_seconds{service="example"}[30m])) by (service) / sum(rate(go_gc_duration_seconds{service="example"}[24h])) by (service)'
+      Expression: 'sprintf("%.2f", query_result * 100)'
+      IntervalSec: 10
+      Template: "GC averaged over the last 30 minutes is {{.Output}}% compared to the last 24 hours for Example service!"
+    - Query: 'sum(go_memstats_heap_inuse_bytes{service="example"}) by (service)'
+      Expression: 'sprintf("%.0f", query_result / 1000000)'
+      IntervalSec: 20
+      Template: "{{.Output}}MB being used by Example service!"
+
+Slack:
+  Webhook: ""
+
+Prometheus:
+  URL: ""
